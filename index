@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>စာအုပ်အိမ် (Book House) — ဆက်သွယ်ရန်</title>
+  <style>
+    :root {
+      --paper: #FAF7F2;
+      --paper-deep: #F1EAE0;
+      --sand: #E6D9C5;
+      --forest: #1E3A2F;
+      --forest-soft: #2A4F40;
+      --terracotta: #C46D3B;
+      --terracotta-soft: #D98555;
+      --ink: #222222;
+      --muted: #5C635E;
+      --card: #FFFFFF;
+      --line: #E3D8C7;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(165deg, #FBF8F3 0%, #F2EAE0 55%, #E8DDD0 100%);
+      color: var(--ink);
+      font-family: 'Noto Sans Myanmar', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 28px 16px 40px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    #sunlight-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Editorial Book-Page Card */
+    .book-sheet {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 430px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 36px 24px 28px;
+      box-shadow:
+        0 24px 50px rgba(30, 58, 47, 0.11),
+        0 4px 14px rgba(30, 58, 47, 0.06),
+        inset 6px 0 0 var(--forest);
+      overflow: hidden;
+    }
+
+    /* Hanging Terracotta Bookmark Ribbon at Top-Right */
+    .bookmark-ribbon {
+      position: absolute;
+      top: 0;
+      right: 28px;
+      width: 28px;
+      height: 52px;
+      background: var(--terracotta);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+      box-shadow: 0 4px 10px rgba(196, 109, 59, 0.25);
+    }
+
+    /* Header */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .emblem-wrap {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      background: var(--forest);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 24px rgba(30, 58, 47, 0.22);
+      border: 3px solid var(--sand);
+    }
+
+    .emblem-wrap svg {
+      width: 58px;
+      height: 58px;
+    }
+
+    .brand-title {
+      font-family: 'Noto Serif Myanmar', Georgia, serif;
+      font-size: 25px;
+      font-weight: 700;
+      color: var(--forest);
+      margin: 0 0 4px;
+      line-height: 1.35;
+    }
+
+    .brand-en {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin: 0 0 12px;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0 0 14px;
+      line-height: 1.6;
+    }
+
+    .cod-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(196, 109, 59, 0.12);
+      color: var(--forest);
+      border: 1px solid rgba(196, 109, 59, 0.35);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    .cod-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--terracotta);
+      flex-shrink: 0;
+    }
+
+    /* Section Divider */
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .section-head::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    /* Primary Phone Action Row */
+    .phone-box {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .link-card {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 15px;
+      border-radius: 14px;
+      text-decoration: none;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .link-card:hover,
+    .link-card:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--terracotta);
+      box-shadow: 0 8px 20px rgba(30, 58, 47, 0.09);
+      outline: none;
+    }
+
+    .link-card.primary-call {
+      background: var(--forest);
+      border-color: var(--forest);
+      color: var(--paper);
+      flex: 1;
+    }
+
+    .link-card.primary-call:hover,
+    .link-card.primary-call:focus-visible {
+      background: var(--forest-soft);
+      border-color: var(--terracotta);
+      box-shadow: 0 10px 22px rgba(30, 58, 47, 0.24);
+    }
+
+    .copy-btn {
+      flex-shrink: 0;
+      width: 54px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--forest);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 10.5px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--terracotta);
+      color: var(--terracotta);
+      transform: translateY(-2px);
+    }
+
+    .copy-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .card-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .icon-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--paper-deep);
+      color: var(--forest);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .primary-call .icon-badge {
+      background: var(--terracotta);
+      color: var(--paper);
+    }
+
+    .icon-badge svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .card-text {
+      min-width: 0;
+    }
+
+    .card-title {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .primary-call .card-title {
+      font-size: 17px;
+      letter-spacing: 0.4px;
+    }
+
+    .card-sub {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .primary-call .card-sub {
+      color: var(--sand);
+    }
+
+    .chevron {
+      width: 18px;
+      height: 18px;
+      color: var(--terracotta);
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .primary-call .chevron {
+      color: var(--sand);
+    }
+
+    .link-card:hover .chevron {
+      transform: translateX(3px);
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Placeholder / Upcoming Social Slots */
+    .link-card.pending {
+      background: rgba(255, 255, 255, 0.65);
+      border-style: dashed;
+      border-color: #CFC2AE;
+    }
+
+    .pending-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--paper-deep);
+      padding: 4px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Editorial Footer */
+    .sheet-footer {
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translate(-50%, 16px);
+      background: var(--forest);
+      color: var(--paper);
+      padding: 11px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+      border: 1px solid rgba(196, 109, 59, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 50;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="sunlight-canvas"></canvas>
+
+  <main class="book-sheet">
+    <div class="bookmark-ribbon" aria-hidden="true"></div>
+
+    <header class="brand-header">
+      <div class="emblem-wrap" aria-hidden="true">
+        <svg viewBox="0 0 240 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 98 L120 26 L160 56 L160 34 L178 34 L178 69.5 L216 98" stroke="#C46D3B" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M48 96 L48 168 C78 168 102 174 120 186 C138 174 162 168 192 168 L192 96" stroke="#FAF7F2" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M66 90 C88 86 108 94 120 112 C132 94 152 86 174 90 L174 152 C152 148 132 156 120 172 C108 156 88 148 66 152 Z" stroke="#C46D3B" stroke-width="7.5" stroke-linejoin="round"/>
+          <line x1="120" y1="112" x2="120" y2="172" stroke="#C46D3B" stroke-width="6.5" stroke-linecap="round"/>
+          <path d="M136 164 L136 204 L146 196 L156 204 L156 160" fill="#C46D3B"/>
+        </svg>
+      </div>
+      <h1 class="brand-title">စာအုပ်အိမ်</h1>
+      <p class="brand-en">Book House</p>
+      <p class="tagline">စာပေချစ်သူတို့ နားခိုရာ — လိုချင်တဲ့စာအုပ်တိုင်း တိုက်ရိုက်မှာယူနိုင်ပါတယ်</p>
+      <div class="cod-pill">
+        <span class="cod-dot"></span>
+        <span>COD ရသည် · အိမ်အရောက်ငွေချေစနစ်</span>
+      </div>
+    </header>
+
+    <!-- ၁။ ဖုန်းဆက်သွယ်ရန် -->
+    <div class="section-head">တိုက်ရိုက် ဖုန်းဆက်သွယ်ရန်</div>
+    <div class="phone-box">
+      <a href="tel:09956728837" class="link-card primary-call">
+        <div class="card-left">
+          <span class="icon-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.01l-2.2 2.2z"/></svg>
+          </span>
+          <div class="card-text">
+            <span class="card-title">09-956728837</span>
+            <span class="card-sub">နှိပ်၍ ဖုန်းခေါ်ဆိုမှာယူရန်</span>
+          </div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </a>
+
+      <button type="button" class="copy-btn" id="copy-phone-btn" aria-label="ဖုန်းနံပါတ် ကူးယူရန်">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <span>ကူးမယ်</span>
+      </button>
+    </div>
+
+    <!-- ၂။ TikTok -->
+    <div class="section-head">တရားဝင် စာမျက်နှာ</div>
+    <div class="stack">
+      <a href="https://www.tiktok.com/@bookhouse33" target="_blank" rel="noopener noreferrer" class="link-card">
+        <div class="card-left">
+          <span class="icon-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.3 0 .6.05.88.13V9.4a6.33 6.33 0 0 0-7.33 6.27A6.34 6.34 0 0 0 15.86 15.7v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4c-.35 0-.7-.04-1.04-.13z"/></svg>
+          </span>
+          <div class="card-text">
+            <span class="card-title">TikTok — စာအုပ်အိမ်</span>
+            <span class="card-sub">tiktok.com/@bookhouse33</span>
+          </div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </a>
+    </div>
+
+    <!-- ၃။ နောက်မှ လင့်ခ်ထပ်ဖြည့်ရန် (Facebook / Viber / Telegram) -->
+    <div class="section-head">အခြား ဆက်သွယ်ရန် လမ်းကြောင်းများ</div>
+    <div class="stack">
+      <!-- FB_LINK: နောက်မှ လင့်ခ်ထည့်လျှင် ဤ button ကို <a href="YOUR_FB_URL" target="_blank" rel="noopener noreferrer" class="link-card"> ပြောင်းပါ -->
+      <button type="button" class="link-card pending" data-pending="Facebook Page">
+        <div class="card-left">
+          <span class="icon-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.33-.04-1.56-.14-2.86-.14-2.71 0-4.64 1.66-4.64 4.7v2.8H7v4h3V22h4v-8.5z"/></svg>
+          </span>
+          <div class="card-text">
+            <span class="card-title">Facebook Page</span>
+            <span class="card-sub">လင့်ခ် ထပ်မံဖြည့်သွင်းရန်</span>
+          </div>
+        </div>
+        <span class="pending-tag">မကြာမီ</span>
+      </button>
+
+      <!-- VIBER_LINK: နောက်မှ လင့်ခ်ထည့်လျှင် <a href="viber://chat?number=%2B959956728837" class="link-card"> ပြောင်းပါ -->
+      <button type="button" class="link-card pending" data-pending="Viber">
+        <div class="card-left">
+          <span class="icon-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.7 1.33 5.12 3.42 6.77L4.5 21.5l3.96-1.32C9.58 20.7 10.76 21 12 21c5.52 0 10-4.03 10-9s-4.48-10-10-10zm4.35 12.83c-.22.62-1.28 1.18-1.78 1.25-.46.07-1.03.1-1.66-.1-.39-.12-.89-.29-1.53-.57-2.7-1.16-4.46-3.88-4.6-4.06-.13-.18-1.1-1.46-1.1-2.79 0-1.33.7-1.98.95-2.25.25-.27.54-.34.72-.34h.52c.17.01.39-.06.61.46.22.54.76 1.85.83 1.98.07.13.11.29.02.47-.09.18-.13.29-.27.45-.13.16-.28.35-.4.47-.13.13-.27.28-.12.54.16.27.7 1.15 1.5 1.86 1.03.92 1.9 1.2 2.17 1.34.27.13.43.11.58-.07.16-.18.67-.78.85-1.05.18-.27.36-.22.61-.13.25.09 1.57.74 1.84.88.27.13.45.2.52.31.07.11.07.65-.15 1.27z"/></svg>
+          </span>
+          <div class="card-text">
+            <span class="card-title">Viber</span>
+            <span class="card-sub">လင့်ခ် ထပ်မံဖြည့်သွင်းရန်</span>
+          </div>
+        </div>
+        <span class="pending-tag">မကြာမီ</span>
+      </button>
+
+      <!-- TG_LINK: နောက်မှ လင့်ခ်ထည့်လျှင် <a href="https://t.me/YOUR_USERNAME" target="_blank" rel="noopener noreferrer" class="link-card"> ပြောင်းပါ -->
+      <button type="button" class="link-card pending" data-pending="Telegram">
+        <div class="card-left">
+          <span class="icon-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+          </span>
+          <div class="card-text">
+            <span class="card-title">Telegram</span>
+            <span class="card-sub">လင့်ခ် ထပ်မံဖြည့်သွင်းရန်</span>
+          </div>
+        </div>
+        <span class="pending-tag">မကြာမီ</span>
+      </button>
+    </div>
+
+    <footer class="sheet-footer">
+      စာအုပ်အိမ် (Book House) · စာအုပ်ချစ်သူတို့အတွက်
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // Subtle warm sunlit dust motes on paper background
+    const canvas = document.getElementById('sunlight-canvas');
+    const ctx = canvas.getContext('2d');
+    let cw = 0;
+    let ch = 0;
+
+    function resize() {
+      cw = canvas.width = window.innerWidth;
+      ch = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const motes = Array.from({ length: 26 }, () => ({
+      x: Math.random() * cw,
+      y: Math.random() * ch,
+      r: Math.random() * 2.4 + 0.8,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: -Math.random() * 0.28 - 0.06,
+      alpha: Math.random() * 0.35 + 0.12,
+      color: Math.random() > 0.4 ? '#C46D3B' : '#1E3A2F'
+    }));
+
+    function tick() {
+      ctx.clearRect(0, 0, cw, ch);
+      for (const m of motes) {
+        m.x += m.vx;
+        m.y += m.vy;
+        if (m.y < -8) {
+          m.y = ch + 8;
+          m.x = Math.random() * cw;
+        }
+        if (m.x < -8) m.x = cw + 8;
+        if (m.x > cw + 8) m.x = -8;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+        ctx.fillStyle = m.color;
+        ctx.globalAlpha = m.alpha;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // Toast helper
+    const toastEl = document.getElementById('toast');
+    let toastTimer = null;
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+    }
+
+    // One-tap Copy Phone Number
+    const copyBtn = document.getElementById('copy-phone-btn');
+    copyBtn.addEventListener('click', () => {
+      const phone = '09-956728837';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(phone)
+          .then(() => showToast('ဖုန်းနံပါတ် 09-956728837 ကို ကူးယူပြီးပါပြီ'))
+          .catch(() => fallbackCopy(phone));
+      } else {
+        fallbackCopy(phone);
+      }
+    });
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('ဖုန်းနံပါတ် 09-956728837 ကို ကူးယူပြီးပါပြီ');
+      } catch (e) {
+        showToast('09-956728837');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // Pending social link feedback
+    document.querySelectorAll('[data-pending]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const name = btn.getAttribute('data-pending');
+        showToast(name + ' လင့်ခ်ကို မကြာမီ ထည့်သွင်းပေးပါမည် — ဖုန်း 09-956728837 သို့ ဆက်သွယ်နိုင်ပါသည်');
+      });
+    });
+  </script>
+</body>
+</html>
